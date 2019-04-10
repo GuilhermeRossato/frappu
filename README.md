@@ -1,7 +1,7 @@
 <p align="center"><img src="https://github.com/GuilhermeRossato/frappu/blob/master/assets/frappu-logo-heavy-im-fell-english.png?raw=true" alt="Frappu test framework"/></p>
 <p align="center">:coffee: Simple test framework for C projects with zero dependencies :coffee:</p>
 
-An incomplete testing framework for projects written with C programming language and compiled with GCC
+An incomplete testing framework for projects written with C programming language that are compiled with GCC.
 
 | Install globally      | Install as dev dependency      | Add to your project | 
 | --------------------- | ------------------------------ | ------------------- |
@@ -30,7 +30,7 @@ This command will process each test it finds on the 'test' folder
 After installing, just run the following (or put in a)
 
 
-## Example test
+## Usage Example
 
 Then, you may put each `.c` source file at your test folder, for example, a basic test file would be at `./test/basic_test.c`:
 
