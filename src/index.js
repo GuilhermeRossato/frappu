@@ -29,7 +29,6 @@ const isFile = path => new Promise((resolve) => { stat(path).then(info => resolv
 		console.log("Could not list tests in test folder");
 		return false;
 	}
-	console.log("\n");
 	for (index in files) {
 		const fileName = files[index];
 		const filePath = prefix+fileName;
@@ -84,7 +83,7 @@ async function processTestSource(filePath, file) {
 		return ({
 			error: true,
 			title: failTitle,
-			message: compilation.message 
+			message: compilation.message
 		});
 	}
 
@@ -92,7 +91,7 @@ async function processTestSource(filePath, file) {
 		return ({
 			error: true,
 			title: failTitle,
-			message: "Could not find executable at "+compilation.exePath 
+			message: "Could not find executable at "+compilation.exePath
 		});
 	}
 
@@ -102,7 +101,7 @@ async function processTestSource(filePath, file) {
 		return {
 			error: true,
 			title: failTitle,
-			message: execution.message 
+			message: execution.message
 		};
 	}
 
@@ -225,5 +224,5 @@ function executeExecutable(cwdPath, exePath, timeoutTime = 10000) {
 				return resolve(result);
 			}
 		})
-	});	
+	});
 }
