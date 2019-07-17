@@ -1,36 +1,43 @@
 {
-  "name": "frappu",
-  "version": "0.8.0",
-  "description": "An incomplete testing framework for projects written with C programming language that are compiled with GCC.",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "node src/index.js"
-  },
-  "bin": {
-    "frappu": "src/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GuilhermeRossato/frappu.git"
-  },
-  "keywords": [
-    "frappu",
-    "testing-framework",
-    "c",
-    "gnucc",
-    "gcc",
-    "no-dependencies",
-    "functional-c",
-    "testing",
-    "tdd"
-  ],
-  "author": "Guilherme Rossato",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/GuilhermeRossato/frappu/issues"
-  },
-  "homepage": "https://github.com/GuilhermeRossato/frappu#readme",
-  "directories": {
-    "test": "test"
-  }
+	"name": "frappu",
+	"version": "0.8.0",
+	"description": "An incomplete testing framework for projects written with C programming language that are compiled with GCC.",
+	"main": "src/index.js",
+	"scripts": {
+		"test-c": "node src/index.js test-c",
+		"lint": "eslint .",
+		"test": "mocha"
+	},
+	"bin": {
+		"frappu": "src/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GuilhermeRossato/frappu.git"
+	},
+	"keywords": [
+		"frappu",
+		"testing-framework",
+		"c",
+		"gnucc",
+		"gcc",
+		"no-dependencies",
+		"functional-c",
+		"testing",
+		"tdd"
+	],
+	"author": "Guilherme Rossato",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/GuilhermeRossato/frappu/issues"
+	},
+	"homepage": "https://github.com/GuilhermeRossato/frappu#readme",
+	"directories": {
+		"test": "test"
+	},
+	"devDependencies": {
+		"chai": "^4.2.0",
+		"eslint": "^6.0.1",
+		"mocha": "^6.1.4"
+	}
 }
