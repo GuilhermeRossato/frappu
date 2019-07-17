@@ -10,8 +10,8 @@ function generateExePathFromSrc(srcPath) {
 function getCompileCommandForFile(srcPath, extraCommands = []) {
 	const exePath = generateExePathFromSrc(srcPath);
 
-	const srcDir = getDirname(srcPath);
-	const exeDir = getDirname(exePath);
+	//const srcDir = getDirname(srcPath);
+	//const exeDir = getDirname(exePath);
 
 	const relativeSrcPath = getBasename(srcPath);
 	const relativeExePath = getBasename(exePath);
@@ -42,7 +42,7 @@ async function generateCompileCommandForFile(filePath) {
 	let content;
 
 	try {
-		content = await readFile(filePath, 'utf-8');
+		content = await readFile(filePath, "utf-8");
 	} catch (err) {
 		throw new Error("Could not open file \""+filePath+"\"");
 	}
@@ -59,8 +59,8 @@ async function generateCompileCommandForFile(filePath) {
 		}
 
 		const libraryName = line.substr(
-			line.indexOf('"')+1,
-			line.lastIndexOf('"')
+			line.indexOf("\"")+1,
+			line.lastIndexOf("\"")
 		);
 
 		if (line.includes("#define FRAPPU_LINK")) {

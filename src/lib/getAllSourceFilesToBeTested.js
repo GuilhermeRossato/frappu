@@ -6,7 +6,7 @@ async function separateFoldersFromFiles(list) {
 	const files = [];
 	await Promise.all(list.map(async function(path) {
 		if (await isFile(path)) {
-			files.push(path)
+			files.push(path);
 		} else {
 			directories.push(path);
 		}
@@ -14,7 +14,7 @@ async function separateFoldersFromFiles(list) {
 	return { directories, files };
 }
 
-module.exports = async function getAllSourceFilesToBeTested(originFolderPath, depth = 4, shallSort) {
+module.exports = async function getAllSourceFilesToBeTested(originFolderPath, shallSort) {
 	const folders = [originFolderPath];
 	const results = [];
 
@@ -36,7 +36,8 @@ module.exports = async function getAllSourceFilesToBeTested(originFolderPath, de
 
 		var fileList = files.filter(filePath => filePath.toLowerCase().endsWith(".c")).map(filePath => filePath.substr(folderName.length+1));
 
-		results[folderName] = {};
+		let compileCommands = {};
+
 		for (let i = 0; i < fileList.length; i++) {
 			const filePath = fileList[i];
 			const fullPath = path.join(folderName,filePath);
@@ -44,8 +45,9 @@ module.exports = async function getAllSourceFilesToBeTested(originFolderPath, de
 			if (!await isFile(fullPath)) {
 				throw new Error("Source file not found: "+fullPath);
 			}
-			results[folderName][filePath] = await generateCompileCommandForFile(fullPath);
+			compileCommands[filePath] = await generateCompileCommandForFile(fullPath);
 		}
+		results[folderName] = compileCommands;
 	}
 
 	if (!shallSort) {
@@ -61,4 +63,4 @@ module.exports = async function getAllSourceFilesToBeTested(originFolderPath, de
 	});
 
 	return sortedObject;
-}
+};

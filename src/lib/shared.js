@@ -1,10 +1,10 @@
-const {promisify} = require('util');
-const {exec} = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const {promisify} = require("util");
+const {exec} = require("child_process");
+const path = require("path");
+const fs = require("fs");
 
-const resolveOrDefault = require('../utils/resolveOrDefault.js');
-const snakeCaseToProperString = require('../utils/snakeCaseToProperString.js');
+const resolveOrDefault = require("../utils/resolveOrDefault.js");
+const snakeCaseToProperString = require("../utils/snakeCaseToProperString.js");
 
 const asyncExec = promisify(exec);
 const readdir = promisify(fs.readdir);

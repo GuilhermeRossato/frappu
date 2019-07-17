@@ -5,7 +5,7 @@
 	"main": "src/index.js",
 	"scripts": {
 		"test-c": "node src/index.js test-c",
-		"lint": "eslint .",
+		"lint": "eslint . --fix",
 		"test": "mocha"
 	},
 	"bin": {

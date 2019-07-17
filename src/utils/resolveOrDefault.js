@@ -9,17 +9,17 @@
  */
 
 async function resolveOrDefault(promise, catchResult, logError = false) {
-    try {
-        return await promise;
-    } catch (err) {
-        if (logError === true) {
-            console.error(err);
-        }
-        if (catchResult === undefined) {
-        	return err;
-        }
-        return catchResult;
-    }
+	try {
+		return await promise;
+	} catch (err) {
+		if (logError === true) {
+			console.error(err);
+		}
+		if (catchResult === undefined) {
+			return err;
+		}
+		return catchResult;
+	}
 }
 
 module.exports = resolveOrDefault;

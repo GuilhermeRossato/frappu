@@ -2,12 +2,12 @@
 
 
 
-const {promisify} = require('util');
-const {exec} = require('child_process');
-const fs = require('fs');
+const {promisify} = require("util");
+const {exec} = require("child_process");
+const fs = require("fs");
 
-const resolveOrDefault = require('./utils/resolveOrDefault.js');
-const snakeCaseToProperString = require('./utils/snakeCaseToProperString.js');
+const resolveOrDefault = require("./utils/resolveOrDefault.js");
+const snakeCaseToProperString = require("./utils/snakeCaseToProperString.js");
 
 const asyncExec = promisify(exec);
 const readdir = promisify(fs.readdir);
@@ -164,8 +164,8 @@ function executeExecutable(cwdPath, exePath, timeoutTime = 10000) {
 	};
 	const options = {
 		cwd: cwdPath,
-		stdio: 'inherit'
-	}
+		stdio: "inherit"
+	};
 	return new Promise(resolve => {
 		let timeout = setTimeout(
 			resolve.bind(this, {
@@ -217,7 +217,7 @@ function executeExecutable(cwdPath, exePath, timeoutTime = 10000) {
 				}
 				return resolve(result);
 			}
-		}).on('exit', code => {
+		}).on("exit", code => {
 			result.code = code;
 			if (result.error !== undefined) {
 				clearTimeout(timeout);
@@ -226,6 +226,6 @@ function executeExecutable(cwdPath, exePath, timeoutTime = 10000) {
 				}
 				return resolve(result);
 			}
-		})
+		});
 	});
 }
