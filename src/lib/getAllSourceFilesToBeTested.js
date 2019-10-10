@@ -1,5 +1,5 @@
 const {readdir, isFile, path} = require("./shared.js");
-const generateCompileCommandForFile = require("./generateCompileCommandForFile.js");
+const generateScriptsForFile = require("./generateScriptsForFile.js");
 
 async function separateFoldersFromFiles(list) {
 	const directories = [];
@@ -14,13 +14,13 @@ async function separateFoldersFromFiles(list) {
 	return { directories, files };
 }
 
-module.exports = async function getAllSourceFilesToBeTested(originFolderPath, shallSort) {
+async function getAllSourceFilesToBeTested(originFolderPath, sortFiles) {
 	const folders = [originFolderPath];
 	const results = [];
 
 	while (folders.length >= 1) {
 		const folderName = folders.pop();
-		const elements = (await readdir(folderName)).map(fileName => folderName + "/" + fileName);
+		const elements = (await readdir(folderName)).map(fileName => folderName + path.sep + fileName);
 		if (elements.length <= 0) {
 			continue;
 		}
@@ -34,33 +34,33 @@ module.exports = async function getAllSourceFilesToBeTested(originFolderPath, sh
 			continue;
 		}
 
-		var fileList = files.filter(filePath => filePath.toLowerCase().endsWith(".c")).map(filePath => filePath.substr(folderName.length+1));
+		const sourcePathList = files.filter(filePath => filePath.toLowerCase().endsWith(".c"));
 
-		let compileCommands = {};
+		const sourceFilenames = sourcePathList.map(filePath => filePath.substr(folderName.length+1));
+
+		const fileList = sourceFilenames;
+
+		let fileDescriptors = [];
 
 		for (let i = 0; i < fileList.length; i++) {
-			const filePath = fileList[i];
-			const fullPath = path.join(folderName,filePath);
-
-			if (!await isFile(fullPath)) {
-				throw new Error("Source file not found: "+fullPath);
+			const fileName = fileList[i];
+			const fullPath = path.join(folderName, fileName);
+			const scripts = await generateScriptsForFile(fullPath);
+			if (scripts.skip) {
+				continue;
 			}
-			compileCommands[filePath] = await generateCompileCommandForFile(fullPath);
+			fileDescriptors.push({
+				"fileName": fileName,
+				"scripts": scripts
+			});
 		}
-		results[folderName] = compileCommands;
+		results.push({
+			"folderPath": folderName,
+			"files": sortFiles ? fileDescriptors.sort((a,b) => a.fileName > b.fileName) : fileDescriptors
+		});
 	}
 
-	if (!shallSort) {
-		return results;
-	}
-
-	var sortedObject = {};
-
-	var keys = Object.keys(results);
-
-	keys.forEach(key => {
-		sortedObject[key] = results[key];
-	});
-
-	return sortedObject;
+	return sortFiles ? results.sort((a, b) => a.folderPath > b.folderPath) : results;
 };
+
+module.exports = getAllSourceFilesToBeTested;
