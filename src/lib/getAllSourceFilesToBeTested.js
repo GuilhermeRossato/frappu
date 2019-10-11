@@ -14,7 +14,7 @@ async function separateFoldersFromFiles(list) {
 	return { directories, files };
 }
 
-async function getAllSourceFilesToBeTested(originFolderPath, sortFiles) {
+async function getAllSourceFilesToBeTested(originFolderPath, sortFiles, regexpFilter) {
 	const folders = [originFolderPath];
 	const results = [];
 
@@ -38,7 +38,7 @@ async function getAllSourceFilesToBeTested(originFolderPath, sortFiles) {
 
 		const sourceFilenames = sourcePathList.map(filePath => filePath.substr(folderName.length+1));
 
-		const fileList = sourceFilenames;
+		const fileList = sourceFilenames.filter(fileName => !regexpFilter || regexpFilter.test(fileName));
 
 		let fileDescriptors = [];
 

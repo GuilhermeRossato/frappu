@@ -17,6 +17,7 @@ async function runMinimal(prefix, config, folderList) {
 				statuses.push({
 					"folderPath": folderPath,
 					"fileName": file.fileName,
+					"command": compileCommand,
 					"error": true,
 					"stage": "compilation",
 					"message": compileResult.message
@@ -26,40 +27,52 @@ async function runMinimal(prefix, config, folderList) {
 				continue;
 			}
 
-			const runCommand = file.scripts.run;
-			const runResult = await executeCommandAt(runCommand, folderPath);
-			if (runResult.error) {
+			let isSuccess = true;
+			const runCommandList = file.scripts.run;
+			for (let runCommand of runCommandList) {
+				const runResult = await executeCommandAt(runCommand, folderPath);
+				if (runResult.error) {
+					statuses.push({
+						"folderPath": folderPath,
+						"fileName": file.fileName,
+						"command": runCommand,
+						"error": true,
+						"stage": "execution",
+						"message": runResult.message
+					});
+					process.stdout.write("F");
+					isSuccess = false;
+					break;
+				}
+				if (runResult.message && file.scripts.shouldBeSilent) {
+					statuses.push({
+						"folderPath": folderPath,
+						"fileName": file.fileName,
+						"command": runCommand,
+						"error": true,
+						"stage": "validation",
+						"message": "Silent execution returned message unexpectedly: "+runResult.message
+					});
+					process.stdout.write("F");
+					isSuccess = false;
+					break;
+				}
+			}
+
+			if (isSuccess) {
 				statuses.push({
 					"folderPath": folderPath,
 					"fileName": file.fileName,
-					"error": true,
-					"stage": "execution",
-					"message": runResult.message
+					"command": runCommandList,
+					"success": true,
+					"stage": "finished"
 				});
+				successCount++;
+				process.stdout.write(".");
+			} else {
 				failureCount++;
-				process.stdout.write("F");
 				continue;
 			}
-			if (runResult.message && file.scripts.shouldBeSilent) {
-				statuses.push({
-					"folderPath": folderPath,
-					"fileName": file.fileName,
-					"error": true,
-					"stage": "validation",
-					"message": "Silent execution returned message unexpectedly: "+runResult.message
-				});
-				failureCount++;
-				process.stdout.write("F");
-				continue;
-			}
-			statuses.push({
-				"folderPath": folderPath,
-				"fileName": file.fileName,
-				"success": true,
-				"stage": "finished"
-			});
-			successCount++;
-			process.stdout.write(".");
 		}
 		folderStatus.push(statuses);
 	}
@@ -94,8 +107,8 @@ async function runMinimal(prefix, config, folderList) {
 			}
 		}
 		process.stdout.write("\n");
-		console.log(`  ${successCount > 0 ? successCount : "No"} passed tests`);
-		console.log(`  ${failureCount > 0 ? failureCount : "No"} failed tests`);
+		console.log(`\t${successCount > 0 ? successCount : "No"} passed tests`);
+		console.log(`\t${failureCount > 0 ? failureCount : "No"} failed tests`);
 	}
 	return executionCount;
 }

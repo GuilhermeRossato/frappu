@@ -20,13 +20,7 @@ const config = getConfigFromArgv();
 		throw new Error(`Test directory not found at "${folderRoot}"`);
 	}
 
-	const folderList = await getAllSourceFilesToBeTested(folderRoot, config["sort-files"]);
-
-	if (config["regexp-filter"]) {
-		for(let folder of folderList) {
-			folder.files = folder.files.filter(file => config["regexp-filter"].test(file.fileName));
-		}
-	}
+	const folderList = await getAllSourceFilesToBeTested(folderRoot, config["sort-files"], config["regexp-filter"]);
 
 	const prefix = path.normalize(folderRoot+path.sep+"..");
 	const executionCount = await (

@@ -20,6 +20,10 @@ async function runNormal(prefix, config, folderList) {
 	for (let folder of folderList) {
 		folder.statuses = [];
 
+		if (!folder.files || folder.files.length === 0) {
+			continue;
+		}
+
 		const folderLabel = folder.folderPath.substr(prefix.length);
 		console.log(`\t- ${folderLabel}`);
 		process.stdout.write("\n");
@@ -36,6 +40,7 @@ async function runNormal(prefix, config, folderList) {
 				folder.statuses.push({
 					"folderPath": folderPath,
 					"fileName": file.fileName,
+					"command": compileCommand,
 					"error": true,
 					"stage": "compilation",
 					"message": compileResult.message
@@ -45,6 +50,8 @@ async function runNormal(prefix, config, folderList) {
 				continue;
 			}
 
+			let isSuccess = true;
+			let resultAggregate = "";
 			const runCommandList = file.scripts.run;
 			for (let runCommand of runCommandList) {
 				const runResult = await executeCommandAt(runCommand, folderPath);
@@ -52,35 +59,45 @@ async function runNormal(prefix, config, folderList) {
 					folder.statuses.push({
 						"folderPath": folderPath,
 						"fileName": file.fileName,
+						"command": runCommand,
 						"error": true,
 						"stage": "execution",
 						"message": runResult.message
 					});
-					failureCount++;
 					printTestConclusion(fileLabel, true, folder.statuses[folder.statuses.length-1].message);
-					continue;
+					isSuccess = false;
+					break;
 				}
 				if (runResult.message && file.scripts.shouldBeSilent) {
 					folder.statuses.push({
 						"folderPath": folderPath,
 						"fileName": file.fileName,
+						"command": runCommand,
 						"error": true,
 						"stage": "validation",
 						"message": "Silent execution returned message unexpectedly: "+runResult.message
 					});
-					failureCount++;
 					printTestConclusion(fileLabel, true, folder.statuses[folder.statuses.length-1].message);
-					continue;
+					isSuccess = false;
+					break;
 				}
+				resultAggregate += runResult.message;
 			}
-			folder.statuses.push({
-				"folderPath": folderPath,
-				"fileName": file.fileName,
-				"success": true,
-				"stage": "finished"
-			});
-			successCount++;
-			printTestConclusion(fileLabel, false, runResult.message);
+			if (isSuccess) {
+				folder.statuses.push({
+					"folderPath": folderPath,
+					"fileName": file.fileName,
+					"command": runCommandList,
+					"success": true,
+					"stage": "finished",
+					"message": resultAggregate
+				});
+				successCount++;
+				printTestConclusion(fileLabel, false, folder.statuses[folder.statuses.length-1].message);
+			} else {
+				failureCount++;
+				continue;
+			}
 		}
 		process.stdout.write("\n");
 	}
@@ -90,9 +107,10 @@ async function runNormal(prefix, config, folderList) {
 			`(${successCount+failureCount}) does not match the test count (${executionCount})`
 		);
 	}
-	process.stdout.write("\n");
-	console.log(`  ${successCount > 0 ? successCount : "No"} passed tests`);
-	console.log(`  ${failureCount > 0 ? failureCount : "No"} failed tests`);
+	console.log(`\t${successCount > 0 ? successCount : "No"} passed tests`);
+	console.log(`\t${failureCount > 0 ? failureCount : "No"} failed tests`);
+
+	return executionCount;
 }
 
 module.exports = runNormal;

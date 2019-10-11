@@ -29,9 +29,93 @@ function generateDefaultScripts(srcPath) {
 
 	return {
 		"compile": compile.join(" "),
-		"run": run.join(" "),
+		"run": [run.join(" ")],
 		"shouldBeSilent": false
 	};
+}
+
+// A state machine approach to interpret a line with a directive
+function interpretDirective(string, lineIndex, filePath) {
+	let state = "starting";
+	let key = "";
+	let parameter = [""];
+
+	for (let i = 0; i < string.length; i++) {
+		const c = string[i];
+		if (state === "starting") {
+			if (c === " ") {
+				state = "getting-key";
+			} else {
+				throw new Error(`Unexpected character (${c}) between #define and directive name at ${filePath}:${lineIndex} (state ${state})`);
+			}
+		} else if (state === "getting-key") {
+			if (c === " ") {
+				state = "getting-parameter-out-quotes";
+			} else if (
+				(c >= "A" && c <= "Z") ||
+				(c >= "a" && c <= "z") ||
+				(c >= "0" && c <= "9") ||
+				(c === "_")
+			) {
+				key += c;
+			} else {
+				throw new Error(`Unexpected character (${c}) at the directive name at ${filePath}:${lineIndex} (state ${state})`);
+			}
+		} else if (state === "getting-parameter-out-quotes") {
+			if (c === "\"") {
+				state = "getting-parameter-in-quotes";
+				parameter[parameter.length-1] += c;
+			} else {
+				parameter[parameter.length-1] += c;
+			}
+		} else if (state === "getting-parameter-in-quotes") {
+			if (c === "\\" && string[i+1] === "\"") {
+				i++;
+				parameter[parameter.length-1] += "\"";
+			} else if (c === "\"" && string[i-1] !== "\\") {
+				state = "just-quit-quote";
+				parameter[parameter.length-1] += c;
+			} else if (i+1 >= string.length) {
+				throw new Error(`Unexpected end of line at directive value at ${filePath}:${lineIndex} (state ${state})`);
+			} else {
+				parameter[parameter.length-1] += c;
+			}
+		} else if (state === "just-quit-quote") {
+			if (c === " ") {
+				continue;
+			} else if (c === ",") {
+				parameter.push("");
+				state = "just-passed-comma";
+			} else {
+				throw new Error(`Unexpected character (${c}) inbetween directive values at ${filePath}:${lineIndex} (state ${state})`);
+			}
+		} else if (state === "just-passed-comma") {
+			if (c === " ") {
+				continue;
+			} else if (c === "\"") {
+				state = "getting-parameter-in-quotes";
+				parameter[parameter.length-1] += c;
+			} else {
+				throw new Error(`Unexpected character (${c}) inbetween directive values at ${filePath}:${lineIndex} (state ${state})`);
+			}
+		}
+	}
+
+	if (parameter[parameter.length-1] === "" || parameter[parameter.length-1] === "\"\"") {
+		parameter.pop();
+	}
+
+	parameter = parameter.map(value => (value[0] === "\"" && value[value.length-1] === "\"") ? value.substring(1, value.length-1) : value);
+
+	if (parameter.length === 0) {
+		parameter = null;
+	} else if (parameter.length === 1) {
+		parameter = parameter[0];
+	}
+
+	key = key.toUpperCase();
+
+	return { key, parameter };
 }
 
 async function generateScriptsForSource(filePath, content) {
@@ -47,57 +131,46 @@ async function generateScriptsForSource(filePath, content) {
 	for (let i = 0 ; i < lines.length; i++) {
 		const line = lines[i].trim().replace(/\s\s+/g, " ").trim();
 
-		if (!line.startsWith("#define")) {
+		if (!line.toLowerCase().startsWith("#define frappu_")) {
 			continue;
 		}
 
-		if (
-			!line.includes("FRAPPU_COMPILE_COMMAND") &&
-			!line.includes("FRAPPU_RUN_COMMAND") &&
-			!line.includes("FRAPPU_SHOULD_BE_SILENT")
-		) {
-			continue;
-		}
+		const {key, parameter} = interpretDirective(line.substr("#define".length), i, filePath);
 
-		if (line.startsWith("//") || (line.includes("//") && line.indexOf("//") < line.indexOf("#define"))) {
-			continue; // Probably doesn't match anything, but left just to make sure
-		}
-
-		const startIndex = line.indexOf("\"")+1;
-		const finalIndex = line.lastIndexOf("\"");
-		const parameter = line.includes("\"") ? line.substr(startIndex,finalIndex).replace(/\\"/g, "\"") : null;
-
-
-		if (line.startsWith("#define FRAPPU_COMPILE_COMMAND ")) {
-			result["compile"] = parameter;
-			continue;
-		}
-
-		if (line.startsWith("#define FRAPPU_RUN_COMMAND ")) {
-			result["run"] = parameter;
-			continue;
-		}
-
-		if (line.startsWith("#define FRAPPU_SHOULD_BE_SILENT")) {
-			if (
-				line.startsWith("#define FRAPPU_SHOULD_BE_SILENT 0") ||
-				line.startsWith("#define FRAPPU_SHOULD_BE_SILENT false") ||
-				line.startsWith("#define FRAPPU_SHOULD_BE_SILENT \"false\"")
-			) {
-				result["shouldBeSilent"] = false;
-			} else if (
-				line.startsWith("#define FRAPPU_SHOULD_BE_SILENT 1") ||
-				line.startsWith("#define FRAPPU_SHOULD_BE_SILENT true") ||
-				line.startsWith("#define FRAPPU_SHOULD_BE_SILENT \"true\"")
-			) {
-				result["shouldBeSilent"] = true;
+		if (key === "FRAPPU_COMPILE_COMMAND") {
+			if (parameter instanceof Array) {
+				throw new Error(`Compile command cannot be an array at line ${i}`);
+			} else if (typeof parameter !== "string") {
+				throw new Error(`Compile command cannot be of type ${typeof parameter} at line ${i}`);
 			} else {
-				throw new Error(`Unknown frappu parameter value at line ${i}: ${JSON.stringify(line.length < 100 ? line : (line.substr(0, 99)+"..."))}`);
+				result["compile"] = parameter;
 			}
 			continue;
 		}
 
-		throw new Error(`Unknown frappu command at line ${i}: ${JSON.stringify(line.length < 100 ? line : (line.substr(0, 99)+"..."))}`);
+		if (key === "FRAPPU_RUN_COMMAND" || key === "FRAPPU_RUN_COMMANDS") {
+			if (parameter instanceof Array) {
+				result["run"] = parameter;
+			} else if (typeof parameter === "string") {
+				result["run"] = [parameter];
+			} else {
+				throw new Error(`Run command cannot be of type ${typeof parameter} at line ${i}`);
+			}
+			continue;
+		}
+
+		if (key === "FRAPPU_SHOULD_BE_SILENT") {
+			if (parameter === "0" || parameter.toLowerCase() === "false") {
+				result["shouldBeSilent"] = false;
+			} else if (parameter === "1" || parameter.toLowerCase() === "true") {
+				result["shouldBeSilent"] = true;
+			} else {
+				throw new Error(`Unknown frappu parameter value at ${filePath}:${i} ${JSON.stringify(line.length < 100 ? line : (line.substr(0, 99)+"..."))}`);
+			}
+			continue;
+		}
+
+		throw new Error(`Unknown frappu directive "${key}" at ${filePath}:${i} ${JSON.stringify(line.length < 100 ? line : (line.substr(0, 99)+"..."))}`);
 	}
 
 	return result;

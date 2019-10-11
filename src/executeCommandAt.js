@@ -23,10 +23,12 @@ function executeCommandAt(exePath, cwdPath, timeoutTime = 10000) {
 
 			if (err) {
 				result.error = true;
-				if (err.stack.trim().startsWith("Error: Command failed: cd") && err.message.includes("gcc")&& err.message.includes(" && ")) {
+				if (err.message.trim().startsWith("Command failed:")) {
+					result.message = err.message;
+				} else if (err.stack.trim().startsWith("Error: Command failed: gcc") && err.message.includes(" && ") && err.message.includes("-fdiagnostics-color=always")) {
 					result.message = "> "+err.message.substr(err.message.indexOf(" && ")+4).replace("-fdiagnostics-color=always ", "");
 				} else {
-					result.message = err.stack;
+					result.message = err.stack.trim();
 				}
 			}
 
