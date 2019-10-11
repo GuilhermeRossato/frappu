@@ -1,4 +1,4 @@
-const {isFile, readFile, getBasename, getDirname} = require("./shared.js");
+const {isFile, readFile, getBasename} = require("./shared.js");
 
 function generateExePathFromSrc(srcPath) {
 	const exePrefix = srcPath.substr(0, srcPath.lastIndexOf("."));
@@ -7,35 +7,10 @@ function generateExePathFromSrc(srcPath) {
 	return exePrefix+exeSufix;
 }
 
-function getDefaultCompileCommand(srcPath, extraCommands = []) {
-	const exePath = generateExePathFromSrc(srcPath);
-
-	//const srcDir = getDirname(srcPath);
-	//const exeDir = getDirname(exePath);
-
-	const relativeSrcPath = getBasename(srcPath);
-	const relativeExePath = getBasename(exePath);
-
-	const commandParts = [
-		"gcc",
-		relativeSrcPath
-	];
-
-	commandParts.concat(extraCommands);
-
-	commandParts.concat([
-		"-o",
-		relativeExePath,
-		"-fdiagnostics-color=always"
-	]);
-
-	return commandParts.join(" ");
-}
-
 function generateDefaultScripts(srcPath) {
 	const originalExeName = getBasename(generateExePathFromSrc(srcPath));
 
-	const prefixedExeName = "frappu-"+originalExeName.replace(/\s/g, '_');
+	const prefixedExeName = "frappu-"+originalExeName.replace(/\s/g, "_");
 
 	const originalSrcName = getBasename(srcPath);
 	const treatedSrcName = originalSrcName.includes(" ") ? `"${originalSrcName}"` : originalSrcName;
@@ -56,7 +31,7 @@ function generateDefaultScripts(srcPath) {
 		"compile": compile.join(" "),
 		"run": run.join(" "),
 		"shouldBeSilent": false
-	}
+	};
 }
 
 async function generateScriptsForSource(filePath, content) {
@@ -70,7 +45,7 @@ async function generateScriptsForSource(filePath, content) {
 	const lines = content.split("\n");
 
 	for (let i = 0 ; i < lines.length; i++) {
-		const line = lines[i].trim().replace(/\s\s+/g, ' ').trim();
+		const line = lines[i].trim().replace(/\s\s+/g, " ").trim();
 
 		if (!line.startsWith("#define")) {
 			continue;
@@ -88,12 +63,9 @@ async function generateScriptsForSource(filePath, content) {
 			continue; // Probably doesn't match anything, but left just to make sure
 		}
 
-
-		let endIndex = 0;
-
 		const startIndex = line.indexOf("\"")+1;
 		const finalIndex = line.lastIndexOf("\"");
-		const parameter = line.includes("\"") ? line.substr(startIndex,finalIndex).replace(/\\\"/g, "\"") : null;
+		const parameter = line.includes("\"") ? line.substr(startIndex,finalIndex).replace(/\\"/g, "\"") : null;
 
 
 		if (line.startsWith("#define FRAPPU_COMPILE_COMMAND ")) {

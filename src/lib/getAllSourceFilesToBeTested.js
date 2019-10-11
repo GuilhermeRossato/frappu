@@ -61,6 +61,6 @@ async function getAllSourceFilesToBeTested(originFolderPath, sortFiles) {
 	}
 
 	return sortFiles ? results.sort((a, b) => a.folderPath > b.folderPath) : results;
-};
+}
 
 module.exports = getAllSourceFilesToBeTested;

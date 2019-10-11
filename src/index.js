@@ -22,6 +22,12 @@ const config = getConfigFromArgv();
 
 	const folderList = await getAllSourceFilesToBeTested(folderRoot, config["sort-files"]);
 
+	if (config["regexp-filter"]) {
+		for(let folder of folderList) {
+			folder.files = folder.files.filter(file => config["regexp-filter"].test(file.fileName));
+		}
+	}
+
 	const prefix = path.normalize(folderRoot+path.sep+"..");
 	const executionCount = await (
 		config["minimal-mode"] ? runMinimal(prefix, config, folderList) : runNormal(prefix, config, folderList)
