@@ -13,7 +13,7 @@ module.exports = (function getConfigFromCommandLineArguments() {
 			require("./printUsage.js")();
 			process.exit(0);
 		} else if (process.argv[i] == "--version" || process.argv[i] == "--v" || process.argv[i] == "/v") {
-			console.log("frappu framework v1.0.0 (2019)");
+			console.log("frappu framework v1.0.1 (2019)");
 			process.exit(0);
 		} else if (process.argv[i] == "--dont-sort" || process.argv[i] == "-s") {
 			configPairs["sort-files"] = false;

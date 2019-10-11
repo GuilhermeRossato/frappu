@@ -54,7 +54,7 @@ Frappu tries to guess you'll want to compile your code with `gcc -o file file.c`
 // ./test/test_is_pair.c
 #include "../src/is_pair.c"
 
-#define FRAPPU_COMPILE_COMMAND "gcc -o test_is_pair.exe test_is_pair.c"
+#define FRAPPU_COMPILE_COMMAND "gcc -o test_is_pair test_is_pair.c"
 #define FRAPPU_RUN_COMMAND "test_is_pair"
 #define FRAPPU_SHOULD_BE_SILENT 0
 
@@ -73,17 +73,17 @@ int main() {
 }
 ```
 
-If you run this tool again, nothing will have changed since the directives are the same as the default ones, but if you are on windows (where the compile and run commands are automatically guessed to use .exe extensions).
+If you run this tool again, nothing will have changed since the directives are the same as the default ones. (If you are on windows, then the executable filename has changed since the default guesses your executable extension).
 
-Anyways, you can also specify the test to run multiple times or link a library like the following win32 app:
+Anyways, with these directives you can change how your code is compiled and executed, even executing it multiple times with different shell commands:
 
 
 ```c
 // ./test/test_is_pair.c
 #include "../src/is_pair.c"
 
-#define FRAPPU_COMPILE_COMMAND "gcc -o test_is_pair.exe test_is_pair.c"
-#define FRAPPU_RUN_COMMAND "test_is_pair 1 0", "test_is_pair 2 1", "test_is_pair 3 0"
+#define FRAPPU_COMPILE_COMMAND "gcc -o ispair test_is_pair.c"
+#define FRAPPU_RUN_COMMAND "./ispair 1 0", "./ispair 2 1", "./ispair 3 0"
 
 int is_pair(int);
 
@@ -119,7 +119,7 @@ At the moment, there are 3 directives:
  - **FRAPPU_RUN_COMMAND**: An array of strings to execute the test.
  - **FRAPPU_SHOULD_BE_SILENT**: Wether to consider the test failed if it tries to write to stdout/stderr.
 
-More details about each directive can be found at their [own file](https://github.com/GuilhermeRossato/frappu/blob/master/docs/directives.md).
+More details about each directive can be found at [their dedicated file](https://github.com/GuilhermeRossato/frappu/blob/master/docs/directives.md).
 
 ## Installing and Usage
 
