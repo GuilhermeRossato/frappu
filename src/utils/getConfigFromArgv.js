@@ -4,7 +4,8 @@ module.exports = (function getConfigFromCommandLineArguments() {
 		"folder-name": "test",
 		"success-indicator-code": 0,
 		"sort-files": true,
-		"regexp-filter": null
+		"regexp-filter": null,
+		"minimal-mode": false
 	};
 	// Decode the parameters
 	for (let i = 2; i < process.argv.length; i++) {
@@ -15,6 +16,8 @@ module.exports = (function getConfigFromCommandLineArguments() {
 			configPairs["sort-files"] = false;
 		} else if (process.argv[i] == "--keep-executables" || process.argv[i] == "-k") {
 			configPairs["keep-executables"] = false;
+		} else if (process.argv[i] == "--minimal" || process.argv[i] == "-min") {
+			configPairs["minimal-mode"] = false;
 		} else if (process.argv[i] == "--match" || process.argv[i] == "-m") {
 			i++;
 			if (i >= process.argv.length) {

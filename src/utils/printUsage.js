@@ -7,6 +7,7 @@ module.exports = function printUsage() {
 	console.log("\t--success-code <d> | -c <d>    Changes the default success code indicator from 0 to a specific integer");
     console.log("\t--dont-sort        | -s        Stop the default sorting of tests by filename and foldername");
     console.log("\t--keep-executables | -k        Does not delete the compiled executables used for tests at the test folder");
+    console.log("\t--minimal          | -min      Prints as little as possible unless there were errors. Dots for passed, F for failures");
 	console.log("\tfolderName                     The name of the folder the tests are to be found (default \"test\")");
 
     console.log("");
