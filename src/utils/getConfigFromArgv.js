@@ -12,6 +12,9 @@ module.exports = (function getConfigFromCommandLineArguments() {
 		if (process.argv[i] == "--help" || process.argv[i] == "--h" || process.argv[i] == "/?") {
 			require("./printUsage.js")();
 			process.exit(0);
+		} else if (process.argv[i] == "--version" || process.argv[i] == "--v" || process.argv[i] == "/v") {
+			console.log("frappu framework v1.0.0 (2019)");
+			process.exit(0);
 		} else if (process.argv[i] == "--dont-sort" || process.argv[i] == "-s") {
 			configPairs["sort-files"] = false;
 		} else if (process.argv[i] == "--keep-executables" || process.argv[i] == "-k") {
