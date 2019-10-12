@@ -1,6 +1,6 @@
 {
 	"name": "frappu",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "A minimalist testing framework for C/C++ projects",
 	"main": "src/index.js",
 	"scripts": {
