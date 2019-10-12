@@ -31,3 +31,4 @@ assets
 docs
 README.md
 test
+.eslintrc.js
