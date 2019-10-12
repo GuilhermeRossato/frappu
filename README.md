@@ -1,7 +1,7 @@
 <p align="center"><img src="https://github.com/GuilhermeRossato/frappu/blob/master/assets/frappu-logo-heavy-im-fell-english.png?raw=true" alt="Frappu test framework"/></p>
 <p align="center">:coffee: Simple test framework for C projects with zero dependencies :coffee:</p>
 
-A testing framework for projects written with C or C++ programming language.
+A minimalist testing framework for projects written with C or C++ programming language.
 
 | Install globally      | Install as dev dependency      | Add to your project |
 | --------------------- | ------------------------------ | ------------------- |
@@ -157,6 +157,11 @@ Example: Test all files that starts with a digit in the filename:
 
 For more details and indepth usage, visit https://github.com/GuilhermeRossato/frappu
 ```
+
+## Size
+
+This tool is as lightweight as I could make it. Using it in your project takes up 23kb (uncompressed) only.
+
 
 ## Security
 
