@@ -236,7 +236,7 @@ For more details and indepth usage, visit https://github.com/GuilhermeRossato/fr
 
 ## Size
 
-This tool is as lightweight as I could make it. Using it in your project takes up 23kb (raw). Your production environment don't need to contain frappu as it is strictly used for testing or making sure the implementation of your code works.
+This tool is as lightweight as I could make it. Using it in your project takes up 23kb (raw). Your production environment doesn't need to contain frappu as it is strictly used for testing or making sure the implementation of your code works.
 
 ## Security
 
